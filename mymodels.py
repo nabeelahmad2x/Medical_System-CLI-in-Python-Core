@@ -20,6 +20,7 @@ class Person(ABC):
     def update_email(self):
         pass
 
+
 class Patient(Person):
     def __init__(self, id, name, contact, email, date_of_birth, blood_group, disease_stage):
         super().__init__(id, name, contact, email, date_of_birth)
@@ -27,7 +28,7 @@ class Patient(Person):
         self.disease_stage = disease_stage
 
     def __str__(self):
-        return f"""Patient(Name: {self.name}, Contact: {self.contact}, Email: {self.email},
+        return f"""Patient(ID: {self.id}, Name: {self.name}, Contact: {self.contact}, Email: {self.email},
                Date of Birth: {self.date_of_birth}, Blood Group: {self.blood_group},
                Disease Stage: {self.disease_stage})"""
     
@@ -49,10 +50,10 @@ class Doctor(Person):
         super().__init__(id, name, contact, email, date_of_birth)
         self.designation = designation
         self.speciality = speciality
-        self.active_status = active_status
+        self.active_status = bool(active_status)
     
     def __str__(self):
-        return f"""Doctor(Name: {self.name}, Contact: {self.contact}, Email: {self.email},
+        return f"""Doctor(ID: {self.id}, Name: {self.name}, Contact: {self.contact}, Email: {self.email},
                Date of Birth: {self.date_of_birth}, Designation: {self.designation}, 
                Speciality: {self.speciality}, Active Status: {self.active_status})"""
     
@@ -86,15 +87,18 @@ class Medicine:
 
 
 class Appointment:
-    def __init__(self, id, date, time, venue):
+    def __init__(self, id, doctor_id, patient_id, date, time, status):
         self.appointment_id = id
+        self.doctor_id = doctor_id
+        self.patient_id = patient_id
         self.appointment_date = date
         self.appointment_time = time
-        self.venue = venue
+        self.status = status
     
     def __str__(self):
-        return f"""Appointment ID: {self.appointment_id}, Date & Time: {self.appointment_date}
-        {self.appointment_time}, Venue: {self.venue}"""
+        return f"""Appointment ID: {self.appointment_id}, Doctor ID: {self.doctor_id}, 
+        Patient ID: {self.patient_id}, Date & Time: {self.appointment_date}, {self.appointment_time},
+        Venue: {self.venue}, Appointment Status: {self.status}"""
     
 
 class Encounter:

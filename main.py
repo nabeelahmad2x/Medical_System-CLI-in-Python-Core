@@ -34,9 +34,9 @@ def medical_system():
         elif user_input == 8:
             print_appointment_info(input("Appointment number:"))
         elif user_input == 9:
-            print_patient_info(input("Patient name:"))
+            print_patient_info(int(input("Patient ID:")))
         elif user_input == 10:
-            print_doctor_info(input("Doctor name:"))
+            print_doctor_info(int(input("Doctor ID:")))
         else:
             print("Invalid Input.")    
 
