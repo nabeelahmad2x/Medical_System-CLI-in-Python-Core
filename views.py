@@ -4,6 +4,7 @@ import re
 from mymodels import Patient, Doctor, Medical_History, Medicine, Appointment, Encounter, Payment_History
 
 #lists to store data on runtime..
+login_credentials = list()
 patient_list = list()
 doctor_list = list()
 appointments_list = list()
@@ -11,6 +12,94 @@ encounters_list = list()
 medicine_list = list()
 payment_list = list()
 medical_history_list = list()
+
+
+# CLI FUNCTIONS..
+def home_cli():
+    while True:
+        email = input("Username/Email: ")
+        password = input("Password: ")
+
+        if login(email, password):
+            pass
+        else:
+            print("Invalid Credentials. Try Again.")
+
+def doctors_system():
+    print("""\t1. Show All Appointments.
+          2. Logout
+          0. Exit""")
+    while True:
+        user_input = int(input("Input: "))
+        if user_input == 0:
+            break
+        elif user_input == 1:
+            print("Printing appointments info..")
+            print_appointment_info()
+        elif user_input == 2:
+            print("LOG OUT..")
+            home_cli()
+
+def admin_system():
+    print("""\t1. Add Doctor.
+          2. Add Patient.
+          3. Add Appointment.
+          4. Add Encounter.
+          5. Add Medicine.
+          6. Add Payment History.
+          7. Show Encounter info
+          8. Show Appointment info
+          9. Show Patient info
+          10. Show Doctor info""")
+    while True:
+        user_input = int(input("Input: "))
+
+        if user_input == 0:
+            break
+        elif user_input == 1:
+            add_doctor()
+        elif user_input == 2:
+            add_patient()
+        elif user_input == 3:
+            add_appointment()
+        elif user_input == 4:
+            add_encounter()
+        elif user_input == 5:
+            add_medicine()
+        elif user_input == 6:
+            add_payment()
+        elif user_input == 7:
+            print_encounter_info(input("Encounter number:"))
+        elif user_input == 8:
+            print_appointment_info(input("Appointment number:"))
+        elif user_input == 9:
+            print_patient_info(int(input("Patient ID:")))
+        elif user_input == 10:
+            print_doctor_info(int(input("Doctor ID:")))
+        else:
+            print("Invalid Input.")  
+
+
+# LOGIN & AUTHENTICATION..
+def authenticate(email, password):
+    global login_credentials
+
+    for i in range(len(login_credentials)):
+        if login_credentials[i].email == email and login_credentials[i].password == password:
+            return True
+
+def login(email, password):
+    global doctor_list
+    if authenticate(email, password):
+        for i in range(len(doctor_list)):
+            if doctor_list[i].email == email and doctor_list[i].name == 'admin':
+                admin_system()
+            else:
+                doctors_system()
+    else:
+        return False
+        
+
 
 
 def calculate_age(birth_date):
@@ -25,6 +114,9 @@ def validate_email(email):
         return True 
     else:
        return False
+
+
+
 
 
 def add_patient():
@@ -190,4 +282,3 @@ def print_encounter_info(encounter_id):
     print_appointment_info(encounter.encounter_appointment_id)
     print_patient_info(encounter.encounter_patient_name)
     print_doctor_info(encounter.encounter_doctor_name)
-

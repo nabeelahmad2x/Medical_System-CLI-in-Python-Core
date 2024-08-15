@@ -1,4 +1,19 @@
-from views import add_doctor, add_appointment, add_medicine, add_encounter, add_patient, add_payment, print_encounter_info, print_appointment_info, print_doctor_info, print_patient_info
+from views import login, add_doctor, add_appointment, add_medicine, add_encounter, add_patient, add_payment, print_encounter_info, print_appointment_info, print_doctor_info, print_patient_info
+
+def doctors_system():
+    print("""\t1. Show All Appointments.
+          2. Logout
+          0. Exit""")
+    while True:
+        user_input = int(input("Input: "))
+        if user_input == 0:
+            break
+        elif user_input == 1:
+            print("Printing appointments info..")
+            print_appointment_info()
+        elif user_input == 2:
+            print("LOG OUT..")
+            home_cli()
 
 
 def medical_system():
@@ -41,11 +56,14 @@ def medical_system():
             print("Invalid Input.")    
 
 
-#id in Person
-#calculate age based on birthday 
-#email auth
-#add doctor id to appointment
-#add status to appointment(completed, not completed)
+def home_cli():
+    while True:
+        email = input("Username/Email: ")
+        password = input("Password: ")
 
+        if login(email, password):
+            pass
+        else:
+            print("Invalid Credentials. Try Again.")
 
-medical_system()
+home_cli()
