@@ -1,10 +1,11 @@
 from datetime import datetime
+
 import re
+import bcrypt
 
 from mymodels import Patient, Doctor, Medical_History, Medicine, Appointment, Encounter, Payment_History
 
 #lists to store data on runtime..
-login_credentials = list()
 patient_list = list()
 doctor_list = list()
 appointments_list = list()
@@ -25,7 +26,7 @@ def home_cli():
         else:
             print("Invalid Credentials. Try Again.")
 
-def doctors_system():
+def doctors_system(doctor_id):
     print("""\t1. Show All Appointments.
           2. Logout
           0. Exit""")
@@ -35,10 +36,12 @@ def doctors_system():
             break
         elif user_input == 1:
             print("Printing appointments info..")
-            print_appointment_info()
+            print_appointment_info(doctor_id)
         elif user_input == 2:
             print("LOG OUT..")
             home_cli()
+        else:
+            print("INVALID INPUT.")
 
 def admin_system():
     print("""\t1. Add Doctor.
@@ -82,11 +85,18 @@ def admin_system():
 
 # LOGIN & AUTHENTICATION..
 def authenticate(email, password):
-    global login_credentials
+    global doctor_list
+    
+    for i in range(len(doctor_list)):
+        if doctor_list[i].email == email:
+            key = doctor_list[i].password[:29]
+            password = bcrypt.hashpw(password.encode(), key)
 
-    for i in range(len(login_credentials)):
-        if login_credentials[i].email == email and login_credentials[i].password == password:
-            return True
+            if doctor_list[i].password == password:
+                return True
+    else:
+        return False
+
 
 def login(email, password):
     global doctor_list
@@ -95,12 +105,13 @@ def login(email, password):
             if doctor_list[i].email == email and doctor_list[i].name == 'admin':
                 admin_system()
             else:
-                doctors_system()
+                doctors_system(doctor_list[i].id)
     else:
         return False
         
 
-
+def fetch_data_from_files():
+    pass
 
 def calculate_age(birth_date):
     today = datetime.today()
@@ -115,10 +126,15 @@ def validate_email(email):
     else:
        return False
 
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode(), salt)
+    return hashed_password
 
 
 
 
+# FOR ADMIN
 def add_patient():
     global patient_list
 
@@ -164,6 +180,9 @@ def add_doctor():
             break
         else:
             print("Invalid Email. Enter again.")
+
+    password = input("Set Password: ")
+    password = hash_password(password)
     
     date_of_birth = input("Date of birth(yyyy/mm/dd): ")
     date_of_birth = datetime.strptime(date_of_birth, '%Y/%m/%d')
@@ -173,10 +192,10 @@ def add_doctor():
     active_status = input("Active Status: ")
 
     # creating object and storing in list 
-    doctor = Doctor(id, name, contact, email, date_of_birth, designation, speciality, active_status)    
+    doctor = Doctor(id, name, contact, email, password, date_of_birth, designation, speciality, active_status)    
     doctor_list.append(doctor)
 
-    print(f"Doctor added at index: {len(doctor_list)}")
+    print(f"Doctor ID: {len(doctor_list)}")
     print(doctor)
 
 def add_medicine():

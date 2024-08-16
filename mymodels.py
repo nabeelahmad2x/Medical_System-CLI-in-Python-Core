@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 
 class Person(ABC):
-    def __init__(self, id, name, contact, email, date_of_birth):
+    def __init__(self, id, name, contact, email, password, date_of_birth):
         self.id = id
         self.name = name
         self.contact = contact
         self.email = email
         self.date_of_birth = date_of_birth
+        self.password = password
  
     @abstractmethod
     def update_name(self):
@@ -22,8 +23,8 @@ class Person(ABC):
 
 
 class Patient(Person):
-    def __init__(self, id, name, contact, email, date_of_birth, blood_group, disease_stage):
-        super().__init__(id, name, contact, email, date_of_birth)
+    def __init__(self, id, name, contact, email, password, date_of_birth, blood_group, disease_stage):
+        super().__init__(id, name, contact, email, password, date_of_birth)
         self.blood_group = blood_group
         self.disease_stage = disease_stage
 
@@ -46,8 +47,8 @@ class Patient(Person):
 
 
 class Doctor(Person):
-    def __init__(self, id, name, contact, email, date_of_birth, designation, speciality, active_status):
-        super().__init__(id, name, contact, email, date_of_birth)
+    def __init__(self, id, name, contact, email, password, date_of_birth, designation, speciality, active_status):
+        super().__init__(id, name, contact, email, password, date_of_birth)
         self.designation = designation
         self.speciality = speciality
         self.active_status = bool(active_status)
