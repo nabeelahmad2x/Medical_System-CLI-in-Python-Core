@@ -8,6 +8,16 @@ class Person(ABC):
         self.email = email
         self.date_of_birth = date_of_birth
         self.password = password
+
+    # #@classmethod
+    # @abstractmethod
+    # def json_to_dictionary(self, item):
+    #     pass
+
+    # #@classmethod
+    # @abstractmethod
+    # def dictionary_to_json(self, item):
+    #     pass
  
     @abstractmethod
     def update_name(self):
@@ -29,6 +39,27 @@ class Patient(Person):
         self.disease_stage = disease_stage
 
     def __str__(self):
+        return f"""Patient(ID: {self.id}, Name: {self.name}, Contact: {self.contact}, Email: {self.email},
+               Date of Birth: {self.date_of_birth}, Blood Group: {self.blood_group},
+               Disease Stage: {self.disease_stage})"""
+    
+    @classmethod
+    def json_to_dictionary(self, item):
+        return self(
+            id = item['id'],
+            name = item['name'],
+            contact = item['contact'],
+            email = item['email'],
+            password = item['password'],
+            date_of_birth = item['date_of_birth'],
+            blood_group = item['blood_group'],
+            disease_stage = item['disease_stage']
+        )
+    
+
+
+    
+    def print_data(self):
         return f"""Patient(ID: {self.id}, Name: {self.name}, Contact: {self.contact}, Email: {self.email},
                Date of Birth: {self.date_of_birth}, Blood Group: {self.blood_group},
                Disease Stage: {self.disease_stage})"""
@@ -57,6 +88,26 @@ class Doctor(Person):
         return f"""Doctor(ID: {self.id}, Name: {self.name}, Contact: {self.contact}, Email: {self.email},
                Date of Birth: {self.date_of_birth}, Designation: {self.designation}, 
                Speciality: {self.speciality}, Active Status: {self.active_status})"""
+    
+    def print_data(self):
+        return f"""Patient(ID: {self.id}, Name: {self.name}, Contact: {self.contact}, Email: {self.email},
+               Date of Birth: {self.date_of_birth}, Designation: {self.designation},
+               Speciality: {self.speciality}, Active Status: {self.active_status})"""
+    
+
+    @classmethod
+    def json_to_dictionary(self, item):
+        return self(
+            id = item['id'],
+            name = item['name'],
+            contact = item['contact'],
+            email = item['email'],
+            password = item['password'],
+            date_of_birth = item['date_of_birth'],
+            designation = item['designation'],
+            speciality = item['speciality'],
+            active_status = item['active_status']
+        )
     
     def update_name(self, new_name):
         self.name = new_name
@@ -99,23 +150,19 @@ class Appointment:
     def __str__(self):
         return f"""Appointment ID: {self.appointment_id}, Doctor ID: {self.doctor_id}, 
         Patient ID: {self.patient_id}, Date & Time: {self.appointment_date}, {self.appointment_time},
-        Venue: {self.venue}, Appointment Status: {self.status}"""
+        Appointment Status: {self.status}"""
     
 
 class Encounter:
-    def __init__(self, encounter_id, appointment_id, patient_name, doctor_name, datetime):
+    def __init__(self, encounter_id, appointment_id, notes, prescription):
         self.encounter_id = encounter_id
         self.encounter_appointment_id = appointment_id
-        self.encounter_patient_name = patient_name
-        self.encounter_doctor_name = doctor_name
-        self.datetime = datetime
-        self.notes = None
-        self.prescription = None
+        self.notes = notes
+        self.prescription = prescription
 
     def __str__(self):
         return f"""Encounter(ID: {self.encounter_id}, Appointment ID: {self.encounter_appointment_id}, 
-               Patient: {self.encounter_patient_name}, Doctor: {self.encounter_doctor_name}, Notes: {self.notes}, 
-               DateTime: {self.datetime}, Prescription: {self.prescription})"""
+        Notes: {self.notes}, Prescription: {self.prescription})"""
     
     def update_notes(self, notes):
         self.notes = notes
@@ -135,8 +182,9 @@ class Payment_History:
                Total Fee: {self.total_fee}, Payment Status: {self.payment_status})"""
 
 class Medical_History:
-    def __init__(self, id, medications, surgeries, allergies, health_conditions):
+    def __init__(self, id, patient_id, medications, surgeries, allergies, health_conditions):
         self.id = id
+        self.patient_id = patient_id
         self.medications = medications
         self.surgeries = surgeries
         self.allergies = allergies

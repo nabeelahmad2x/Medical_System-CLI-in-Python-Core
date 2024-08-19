@@ -1,6 +1,7 @@
 from datetime import datetime
-
+import json
 import re
+
 import bcrypt
 
 from mymodels import Patient, Doctor, Medical_History, Medicine, Appointment, Encounter, Payment_History
@@ -17,6 +18,7 @@ medical_history_list = list()
 
 # CLI FUNCTIONS..
 def home_cli():
+    load_user_data()
     while True:
         email = input("Username/Email: ")
         password = input("Password: ")
@@ -26,7 +28,7 @@ def home_cli():
         else:
             print("Invalid Credentials. Try Again.")
 
-def doctors_system(doctor_id):
+def doctors_system():
     print("""\t1. Show All Appointments.
           2. Logout
           0. Exit""")
@@ -36,7 +38,7 @@ def doctors_system(doctor_id):
             break
         elif user_input == 1:
             print("Printing appointments info..")
-            print_appointment_info(doctor_id)
+            print_appointment_info()
         elif user_input == 2:
             print("LOG OUT..")
             home_cli()
@@ -89,29 +91,63 @@ def authenticate(email, password):
     
     for i in range(len(doctor_list)):
         if doctor_list[i].email == email:
-            key = doctor_list[i].password[:29]
-            password = bcrypt.hashpw(password.encode(), key)
+            
+            # password saved in doctor_list[i].password is of str type. but is not encoding unless
+            # saved in a seperate variable --> typcast to str --> then encode only then its working..
+            saved_pass = doctor_list[i].password
+            saved_pass = str(saved_pass)
+            saved_pass = saved_pass.encode()
 
-            if doctor_list[i].password == password:
+            key = saved_pass[:29]      
+            
+            password = str(password)
+            password = password.encode()          
+
+            password = bcrypt.hashpw(password, key)
+            if saved_pass == password:
                 return True
     else:
         return False
 
-
 def login(email, password):
+    
     global doctor_list
+    
     if authenticate(email, password):
-        for i in range(len(doctor_list)):
-            if doctor_list[i].email == email and doctor_list[i].name == 'admin':
+        for items in doctor_list:
+            if items.designation == "admin" and items.email == email:
                 admin_system()
+                break
             else:
-                doctors_system(doctor_list[i].id)
+                doctors_system()
+                break
     else:
         return False
         
 
-def fetch_data_from_files():
-    pass
+# helpers..
+def load_user_data():
+    global doctor_list, patient_list, medical_history_list, medicine_list, appointments_list, encounters_list, payment_list
+    
+    doctor_list = fetch_data_from_files('C:\\Users\\nabee\\OneDrive\\Documents\\MedicalSystemDB\\doctor.txt', Doctor)
+    
+    # print(doctor_list)
+    patient_list = fetch_data_from_files('C:\\Users\\nabee\\OneDrive\\Documents\\MedicalSystemDB\\patient.txt', Patient)
+    #appointments_list = fetch_data_from_files('C:\\Users\\nabee\\OneDrive\\Documents\\MedicalSystemDB\\appointment.txt', Appointment)
+
+def fetch_data_from_files(filepath, class_name):
+    my_list = list()
+
+    file = open(filepath, 'r')
+    data = json.load(file)
+
+    for item in data:
+        my_list.append(class_name.json_to_dictionary(item))
+        my_list[0].print_data()
+        # print(my_list)
+
+    file.close()
+    return my_list
 
 def calculate_age(birth_date):
     today = datetime.today()
@@ -135,6 +171,16 @@ def hash_password(password):
 
 
 # FOR ADMIN
+def start_appointment(appointment_id):
+    for i in range(len(appointments_list)):
+        if appointments_list[i].id == appointment_id:
+            add_encounter(appointment_id)
+        else:
+            print("Appointment not found.")
+
+def end_appointment(appointment_id):
+    pass
+
 def add_patient():
     global patient_list
 
@@ -225,16 +271,14 @@ def add_appointment():
     print(f"Appointment added at: {len(appointments_list)}")
     print(f"Details: {appointment}")
 
-def add_encounter():
+def add_encounter(appointment_number):
     global encounter_list
 
     encounter_id = len(encounters_list) + 1
-    datetime = input("date: ")
-    appointment_id = int(input("Enter Appoinment ID: "))
-    patient_name = input("Enter Patient Name: ")
-    doctor_name = input("Enter Doctor Name: ")
-    
-    encounter = Encounter(encounter_id, appointment_id, patient_name, doctor_name, datetime)
+    appointment_id = appointment_number
+    doctor_notes = input("Doctor Notes: ")
+    prescription = input("Prescription: ")
+    encounter = Encounter(encounter_id, appointment_id, doctor_notes, prescription)
     encounters_list.append(encounter)
     print(f"Encounter Saved at index: {len(encounters_list)}")
     
@@ -254,12 +298,13 @@ def add_medical_history():
     global medical_history_list
 
     id = len(medical_history_list) + 1
+    patient_id = input("Patient id: ")
     medications = input("Any Regular Medications: ")
     surgeries = input("Past Surgeries: ")
     allergies = input("Allergies: ")
     health_conditions = input("Health conditions: ")
 
-    medical_history = Medical_History(id,medications, surgeries, allergies, health_conditions)
+    medical_history = Medical_History(id, patient_id, medications, surgeries, allergies, health_conditions)
     medical_history_list.append(medical_history)
 
     print("Info Saved.")
